@@ -1,10 +1,10 @@
-import streamlit as st
+simport streamlit as st
 
 # Título de la app
 st.title("Conversor Universal")
 
 # Autor
-st.write("Esta app fue elaborada por Santiago.")
+st.write("Esta app fue elaborada por Santiago Vanegas.")
 
 # Selección de categoría
 categoria = st.selectbox(
