@@ -6,7 +6,7 @@ import datetime
 st.title("Registro de Finanzas Personales")
 
 # Autor
-st.write("Esta app fue elaborada por Santiago Vanegas.")
+st.write("Esta app fue elaborada por Santiago.")
 
 # Crear estructuras de datos para almacenar presupuestos, ingresos, gastos y metas de ahorro
 if 'presupuestos' not in st.session_state:
@@ -87,6 +87,9 @@ if not pd.api.types.is_datetime64_any_dtype(st.session_state.registros['Fecha'])
 # Generar reporte de diferencias (Presupuestado vs Real)
 st.header("Reportes de Finanzas")
 fecha_inicio = st.date_input("Selecciona la fecha de inicio para el reporte", min_value=datetime.date(2023, 1, 1))
+
+# Convertir la fecha de inicio a datetime
+fecha_inicio = pd.to_datetime(fecha_inicio)
 
 # Filtrar las transacciones según la fecha
 transacciones_filtradas = st.session_state.registros[st.session_state.registros['Fecha'] >= fecha_inicio]
