@@ -5,7 +5,7 @@ import numpy as np
 st.title("Resolución de Ecuaciones Lineales")
 
 # Autor
-st.write("Esta app fue elaborada por 'COLOQUE AQUÍ SU NOMBRE'.")
+st.write("Esta app fue elaborada por 'Santiago Vanegas'.")
 
 # Instrucciones para el usuario
 st.write("""
