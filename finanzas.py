@@ -11,16 +11,27 @@ st.write("Esta app fue elaborada por Santiago.")
 # Crear una estructura de datos para almacenar los presupuestos, ingresos y gastos
 if 'presupuestos' not in st.session_state:
     st.session_state.presupuestos = pd.DataFrame(columns=["Categoría", "Presupuesto Mensual"])
+
 if 'registros' not in st.session_state:
     st.session_state.registros = pd.DataFrame(columns=["Fecha", "Categoría", "Tipo", "Monto"])
 
 # Función para agregar un presupuesto
 def agregar_presupuesto(categoria, monto):
-    st.session_state.presupuestos = st.session_state.presupuestos.append({"Categoría": categoria, "Presupuesto Mensual": monto}, ignore_index=True)
+    # Asegurarse de que `presupuestos` sea un DataFrame
+    if not isinstance(st.session_state.presupuestos, pd.DataFrame):
+        st.session_state.presupuestos = pd.DataFrame(columns=["Categoría", "Presupuesto Mensual"])
+
+    nuevo_presupuesto = pd.DataFrame({"Categoría": [categoria], "Presupuesto Mensual": [monto]})
+    st.session_state.presupuestos = pd.concat([st.session_state.presupuestos, nuevo_presupuesto], ignore_index=True)
 
 # Función para registrar un ingreso o gasto
 def registrar_transaccion(fecha, categoria, tipo, monto):
-    st.session_state.registros = st.session_state.registros.append({"Fecha": fecha, "Categoría": categoria, "Tipo": tipo, "Monto": monto}, ignore_index=True)
+    # Asegurarse de que `registros` sea un DataFrame
+    if not isinstance(st.session_state.registros, pd.DataFrame):
+        st.session_state.registros = pd.DataFrame(columns=["Fecha", "Categoría", "Tipo", "Monto"])
+
+    nuevo_registro = pd.DataFrame({"Fecha": [fecha], "Categoría": [categoria], "Tipo": [tipo], "Monto": [monto]})
+    st.session_state.registros = pd.concat([st.session_state.registros, nuevo_registro], ignore_index=True)
 
 # Sección para ingresar presupuesto
 st.header("Definir Presupuesto Mensual")
@@ -73,36 +84,4 @@ transacciones_filtradas = st.session_state.registros[st.session_state.registros[
 # Reporte semanal o mensual
 tipo_reporte = st.radio("Selecciona el tipo de reporte", ("Semanal", "Mensual"))
 
-# Función para calcular el reporte de diferencias
-def reporte_diferencias(tipo_reporte):
-    # Agrupar las transacciones por categoría
-    transacciones_filtradas['Semana'] = transacciones_filtradas['Fecha'].apply(lambda x: x.isocalendar()[1])  # Semana del año
-    transacciones_filtradas['Mes'] = transacciones_filtradas['Fecha'].apply(lambda x: x.month)  # Mes
-
-    # Dependiendo del tipo de reporte, filtrar por semana o mes
-    if tipo_reporte == "Semanal":
-        transacciones_filtradas['Semana'] = transacciones_filtradas['Fecha'].apply(lambda x: x.isocalendar()[1])
-        transacciones_filtradas_grouped = transacciones_filtradas.groupby(['Semana', 'Categoría', 'Tipo'])['Monto'].sum().reset_index()
-    elif tipo_reporte == "Mensual":
-        transacciones_filtradas_grouped = transacciones_filtradas.groupby(['Mes', 'Categoría', 'Tipo'])['Monto'].sum().reset_index()
-
-    # Comparar las transacciones reales con el presupuesto
-    reporte = pd.merge(
-        transacciones_filtradas_grouped,
-        st.session_state.presupuestos,
-        left_on="Categoría",
-        right_on="Categoría",
-        how="left"
-    )
-
-    # Calcular la diferencia (real - presupuestado)
-    reporte['Diferencia'] = reporte['Monto'] - reporte['Presupuesto Mensual']
-    
-    return reporte
-
-# Mostrar el reporte
-if st.button("Generar Reporte"):
-    reporte = reporte_diferencias(tipo_reporte)
-    st.write(f"Reporte {tipo_reporte}:")
-    st.dataframe(reporte)
-
+# Función para calcular el r
