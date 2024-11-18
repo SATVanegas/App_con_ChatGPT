@@ -4,10 +4,10 @@ import streamlit as st
 st.title("Cálculo del PAPA")
 
 # Autor
-st.write("Esta app fue elaborada por 'Santiago Vanegas'.")
+st.write("Esta app fue elaborada por 'COLOQUE AQUÍ SU NOMBRE'.")
 
 # Instrucciones para el usuario
-st.write("Ingresa las materias vistas con sus respectivas calificaciones, créditos y tipología (por ejemplo, básica, electiva, etc.).")
+st.write("Ingresa las materias vistas con sus respectivas calificaciones, créditos y tipología.")
 
 # Crear listas para almacenar la información de las materias
 materias = []
@@ -15,22 +15,25 @@ calificaciones = []
 creditos = []
 tipologias = []
 
+# Lista de tipologías disponibles
+tipologias_disponibles = ["Básica", "Electiva", "Disciplinar", "Libre elección"]
+
 # Formulario para ingresar datos de las materias
 st.subheader("Agregar información de materias")
 nombre_materia = st.text_input("Nombre de la materia:")
 calificacion = st.number_input("Calificación (0.0 a 5.0):", min_value=0.0, max_value=5.0, step=0.1)
 credito = st.number_input("Créditos (número entero):", min_value=1, step=1)
-tipologia = st.text_input("Tipología de la asignatura (por ejemplo, básica, electiva):")
+tipologia = st.selectbox("Tipología de la asignatura:", tipologias_disponibles)
 
 if st.button("Agregar materia"):
-    if nombre_materia and tipologia:
+    if nombre_materia:
         materias.append(nombre_materia)
         calificaciones.append(calificacion)
         creditos.append(credito)
         tipologias.append(tipologia)
         st.success(f"Materia '{nombre_materia}' agregada con éxito.")
     else:
-        st.error("Por favor, completa todos los campos antes de agregar.")
+        st.error("Por favor, ingresa el nombre de la materia antes de agregar.")
 
 # Mostrar materias ingresadas
 if materias:
