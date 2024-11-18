@@ -80,6 +80,10 @@ st.dataframe(st.session_state.registros)
 st.header("Metas de Ahorro")
 st.dataframe(st.session_state.metas_ahorro)
 
+# Convertir la columna 'Fecha' a datetime si no lo está
+if not pd.api.types.is_datetime64_any_dtype(st.session_state.registros['Fecha']):
+    st.session_state.registros['Fecha'] = pd.to_datetime(st.session_state.registros['Fecha'])
+
 # Generar reporte de diferencias (Presupuestado vs Real)
 st.header("Reportes de Finanzas")
 fecha_inicio = st.date_input("Selecciona la fecha de inicio para el reporte", min_value=datetime.date(2023, 1, 1))
