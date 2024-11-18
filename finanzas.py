@@ -6,7 +6,7 @@ import datetime
 st.title("Registro de Finanzas Personales")
 
 # Autor
-st.write("Esta app fue elaborada por Santiago.")
+st.write("Esta app fue elaborada por Santiago Vanegas.")
 
 # Crear una estructura de datos para almacenar los presupuestos, ingresos y gastos
 if 'presupuestos' not in st.session_state:
