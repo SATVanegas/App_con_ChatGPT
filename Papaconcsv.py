@@ -5,7 +5,7 @@ import pandas as pd
 st.title("Cálculo del PAPA a partir de archivo")
 
 # Autor
-st.write("Esta app fue elaborada por 'COLOQUE AQUÍ SU NOMBRE'.")
+st.write("Esta app fue elaborada por 'Santiago Vanegas'.")
 
 # Instrucciones
 st.write("""
