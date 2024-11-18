@@ -1,68 +1,64 @@
 import streamlit as st
-import pandas as pd
 
 # Título de la app
-st.title("Cálculo del PAPA (Promedio Acumulado de Puntos Académicos)")
+st.title("Cálculo del PAPA")
 
 # Autor
-st.write("Esta app fue elaborada por Santiago Vanegas.")
+st.write("Esta app fue elaborada por 'Santiago Vanegas'.")
 
-# Estructura para guardar las asignaturas ingresadas
-if 'asignaturas' not in st.session_state:
-    st.session_state.asignaturas = pd.DataFrame(columns=["Nombre", "Tipología", "Calificación", "Créditos"])
+# Instrucciones para el usuario
+st.write("Ingresa las materias vistas con sus respectivas calificaciones, créditos y tipología (por ejemplo, básica, electiva, etc.).")
 
-# Función para agregar asignatura
-def agregar_asignatura(nombre, tipologia, calificacion, creditos):
-    nueva_asignatura = pd.DataFrame({"Nombre": [nombre], "Tipología": [tipologia], 
-                                     "Calificación": [calificacion], "Créditos": [créditos]})
-    st.session_state.asignaturas = pd.concat([st.session_state.asignaturas, nueva_asignatura], ignore_index=True)
+# Crear listas para almacenar la información de las materias
+materias = []
+calificaciones = []
+creditos = []
+tipologias = []
 
-# Función para calcular el PAPA
-def calcular_papa():
-    total_creditos = st.session_state.asignaturas['Créditos'].sum()
-    suma_puntos = (st.session_state.asignaturas['Calificación'] * st.session_state.asignaturas['Créditos']).sum()
-    if total_creditos > 0:
-        papa_global = suma_puntos / total_creditos
+# Formulario para ingresar datos de las materias
+st.subheader("Agregar información de materias")
+nombre_materia = st.text_input("Nombre de la materia:")
+calificacion = st.number_input("Calificación (0.0 a 5.0):", min_value=0.0, max_value=5.0, step=0.1)
+credito = st.number_input("Créditos (número entero):", min_value=1, step=1)
+tipologia = st.text_input("Tipología de la asignatura (por ejemplo, básica, electiva):")
+
+if st.button("Agregar materia"):
+    if nombre_materia and tipologia:
+        materias.append(nombre_materia)
+        calificaciones.append(calificacion)
+        creditos.append(credito)
+        tipologias.append(tipologia)
+        st.success(f"Materia '{nombre_materia}' agregada con éxito.")
     else:
-        papa_global = 0
-    return papa_global
+        st.error("Por favor, completa todos los campos antes de agregar.")
 
-# Función para calcular el PAPA por tipología
-def calcular_papa_por_tipologia(tipologia):
-    asignaturas_tipologia = st.session_state.asignaturas[st.session_state.asignaturas['Tipología'] == tipologia]
-    total_creditos = asignaturas_tipologia['Créditos'].sum()
-    suma_puntos = (asignaturas_tipologia['Calificación'] * asignaturas_tipologia['Créditos']).sum()
-    if total_creditos > 0:
-        papa_tipologia = suma_puntos / total_creditos
+# Mostrar materias ingresadas
+if materias:
+    st.subheader("Materias ingresadas")
+    for i in range(len(materias)):
+        st.write(f"- {materias[i]}: Calificación = {calificaciones[i]}, Créditos = {creditos[i]}, Tipología = {tipologias[i]}")
+
+# Cálculo del PAPA global
+if st.button("Calcular PAPA Global"):
+    if materias:
+        suma_ponderada = sum(c * cal for c, cal in zip(creditos, calificaciones))
+        suma_creditos = sum(creditos)
+        papa_global = suma_ponderada / suma_creditos if suma_creditos > 0 else 0
+        st.subheader("Resultado PAPA Global")
+        st.write(f"Tu PAPA global es: **{papa_global:.2f}**")
     else:
-        papa_tipologia = 0
-    return papa_tipologia
+        st.error("Por favor, ingresa materias antes de calcular el PAPA.")
 
-# Sección para ingresar asignaturas
-st.header("Ingreso de Asignaturas")
-nombre = st.text_input("Nombre de la Asignatura")
-tipologia = st.selectbox("Tipología de la Asignatura", ["Obligatoria", "Optativa", "Formación General"])
-calificacion = st.slider("Calificación obtenida", 0.0, 5.0, 0.0, 0.1)
-creditos = st.number_input("Créditos de la asignatura", min_value=1, step=1)
-
-if st.button("Agregar Asignatura"):
-    if nombre and tipologia and calificacion >= 0.0 and creditos > 0:
-        agregar_asignatura(nombre, tipologia, calificacion, creditos)
-        st.success(f"Asignatura {nombre} agregada exitosamente.")
+# Cálculo del PAPA por tipología
+if st.button("Calcular PAPA por Tipología"):
+    if materias:
+        tipologias_unicas = set(tipologias)
+        st.subheader("Resultados por Tipología")
+        for tipo in tipologias_unicas:
+            indices = [i for i, t in enumerate(tipologias) if t == tipo]
+            suma_ponderada_tipo = sum(creditos[i] * calificaciones[i] for i in indices)
+            suma_creditos_tipo = sum(creditos[i] for i in indices)
+            papa_tipo = suma_ponderada_tipo / suma_creditos_tipo if suma_creditos_tipo > 0 else 0
+            st.write(f"- Tipología '{tipo}': PAPA = **{papa_tipo:.2f}**")
     else:
-        st.error("Por favor, completa todos los campos correctamente.")
-
-# Mostrar las asignaturas ingresadas
-st.header("Asignaturas Ingresadas")
-st.dataframe(st.session_state.asignaturas)
-
-# Calcular el PAPA global
-st.header("Cálculo del PAPA Global")
-papa_global = calcular_papa()
-st.write(f"El PAPA global es: {papa_global:.2f}")
-
-# Calcular el PAPA por tipología
-st.header("Cálculo del PAPA por Tipología")
-tipologia_seleccionada = st.selectbox("Selecciona la tipología para el cálculo del PAPA", ["Obligatoria", "Optativa", "Formación General"])
-papa_tipologia = calcular_papa_por_tipologia(tipologia_seleccionada)
-st.write(f"El PAPA para las asignaturas de tipología '{tipologia_seleccionada}' es: {papa_tipologia:.2f}")
+        st.error("Por favor, ingresa materias antes de calcular el PAPA por tipología.")
