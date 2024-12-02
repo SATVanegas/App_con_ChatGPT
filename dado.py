@@ -1,7 +1,6 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
-from scipy import stats
 
 # Título de la aplicación
 st.title('Simulación de Lanzamiento de un Dado')
@@ -16,7 +15,7 @@ st.write(resultados)
 # Calcular estadísticas
 media = np.mean(resultados)
 mediana = np.median(resultados)
-moda = stats.mode(resultados)[0][0]
+moda = pd.Series(resultados).mode()[0]  # Moda usando Pandas
 varianza = np.var(resultados)
 desviacion_estandar = np.std(resultados)
 
